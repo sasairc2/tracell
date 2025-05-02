@@ -1,0 +1,48 @@
+#!/bin/bash
+#
+# tracell - tiny shell tools for tracking handmade installs
+#
+# tracell is a minimal package trace system for ${HOME}/local.
+# It logs what gets installed, helps list it, and can clean it up later.
+# Inspired by porg, LFS, and the joy of knowing what your system is doing.
+#
+# License: WTFPL
+# Author: sasairc - 2025
+
+set -e
+
+if [ $# -lt 2 ]; then
+    echo "Usage: $0 <package-name> <install-command...>"
+    echo "Example: $0 zlib make install"
+    exit 1
+fi
+
+PKGNAME="$1"
+shift
+INSTALL_CMD="$@"
+
+PREFIX="${HOME}/local"
+LOGDIR="${HOME}/local/var/log/tracell-logs"
+TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+LOGFILE="${LOGDIR}/${PKGNAME}-${TIMESTAMP}.log"
+
+mkdir -p "${LOGDIR}"
+
+echo "[*] Taking pre-install snapshot..."
+find "${PREFIX}" \
+    \( -path "${PREFIX}/src" -o -path "${PREFIX}/var" -o -path "${PREFIX}/tmp" \) -prune \
+    -o \( -type f -o -type l \) -print | sort > /tmp/pre-install.lst
+
+echo "[*] Running install command: ${INSTALL_CMD}"
+eval "${INSTALL_CMD}"
+
+echo "[*] Taking post-install snapshot..."
+find "${PREFIX}" \
+    \( -path "${PREFIX}/src" -o -path "${PREFIX}/var" -o -path "${PREFIX}/tmp" \) -prune \
+    -o \( -type f -o -type l \) -print | sort > /tmp/post-install.lst
+
+echo "[*] Calculating installed files..."
+comm -13 /tmp/pre-install.lst /tmp/post-install.lst > "${LOGFILE}"
+
+echo "[*] Install log saved to: ${LOGFILE}"
+wc -l "${LOGFILE}"

@@ -1,0 +1,38 @@
+#!/bin/bash
+#
+# tracell - tiny shell tools for tracking handmade installs
+#
+# tracell is a minimal package trace system for ${HOME}/local.
+# It logs what gets installed, helps list it, and can clean it up later.
+# Inspired by porg, LFS, and the joy of knowing what your system is doing.
+#
+# License: WTFPL
+# Author: sasairc - 2025
+
+set -e
+
+PKGNAME="$1"
+LOGDIR="${HOME}/local/var/log/tracell-logs"
+
+if [ -z "${PKGNAME}" ]; then
+    echo "Usage: $0 <package-name>"
+    exit 1
+fi
+
+LOGFILE=$(ls -t "${LOGDIR}/${PKGNAME}-"*.log 2>/dev/null | head -n1)
+
+if [ ! -f "${LOGFILE}" ]; then
+    echo "No install log found for package: ${PKGNAME}"
+    exit 1
+fi
+
+if [ ! -s "${LOGFILE}" ]; then
+    echo "Install log is empty: ${LOGFILE}"
+    exit 1
+fi
+
+echo "[*] Uninstalling files from: ${LOGFILE}"
+xargs rm -v < "${LOGFILE}"
+
+echo "[*] Removing install log: ${LOGFILE}"
+rm -v "${LOGFILE}"

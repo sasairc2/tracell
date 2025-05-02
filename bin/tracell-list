@@ -1,0 +1,19 @@
+#!/bin/bash
+#
+# tracell - tiny shell tools for tracking handmade installs
+#
+# tracell is a minimal package trace system for ${HOME}/local.
+# It logs what gets installed, helps list it, and can clean it up later.
+# Inspired by porg, LFS, and the joy of knowing what your system is doing.
+#
+# License: WTFPL
+# Author: sasairc - 2025
+
+LOGDIR="${HOME}/local/var/log/tracell-logs"
+
+if [ ! -d "${LOGDIR}" ]; then
+    echo "No tracell logs found in: ${LOGDIR}"
+    exit 0
+fi
+
+ls -1 "${LOGDIR}" | sort | sed -E 's/(.*)-([0-9]{8}-[0-9]{6})\.log/\2\t\1/'
