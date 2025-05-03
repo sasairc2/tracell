@@ -23,15 +23,19 @@ INSTALL_CMD="$@"
 
 PREFIX="${HOME}/local"
 LOGDIR="${HOME}/local/var/log/tracell-logs"
-TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
 LOGFILE="${LOGDIR}/${PKGNAME}-${TIMESTAMP}.log"
+
+PRE_INSTALL_LIST="$(mktemp /tmp/tracell.XXXX)"
+POST_INSTALL_LIST="$(mktemp /tmp/tracell.XXXX)"
+trap 'rm -f "${PRE_INSTALL_LIST}" "${POST_INSTALL_LIST}"' EXIT
 
 mkdir -p "${LOGDIR}"
 
 echo "[*] Taking pre-install snapshot..."
 find "${PREFIX}" \
     \( -path "${PREFIX}/src" -o -path "${PREFIX}/var" -o -path "${PREFIX}/tmp" \) -prune \
-    -o \( -type f -o -type l \) -print | sort > /tmp/pre-install.lst
+    -o \( -type f -o -type l \) -print | sort > "${PRE_INSTALL_LIST}"
 
 echo "[*] Running install command: ${INSTALL_CMD}"
 eval "${INSTALL_CMD}"
@@ -39,10 +43,10 @@ eval "${INSTALL_CMD}"
 echo "[*] Taking post-install snapshot..."
 find "${PREFIX}" \
     \( -path "${PREFIX}/src" -o -path "${PREFIX}/var" -o -path "${PREFIX}/tmp" \) -prune \
-    -o \( -type f -o -type l \) -print | sort > /tmp/post-install.lst
+    -o \( -type f -o -type l \) -print | sort > "${POST_INSTALL_LIST}"
 
 echo "[*] Calculating installed files..."
-comm -13 /tmp/pre-install.lst /tmp/post-install.lst > "${LOGFILE}"
+comm -13 "${PRE_INSTALL_LIST}" "${POST_INSTALL_LIST}" > "${LOGFILE}"
 
 echo "[*] Install log saved to: ${LOGFILE}"
 wc -l "${LOGFILE}"
