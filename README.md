@@ -19,7 +19,8 @@ Inspired by the spirit of [Linux From Scratch](https://www.linuxfromscratch.org/
 
 ## License
 
-[WTFPL version 2](http://www.wtfpl.net/)
+This software is licensed under the Can't Be Bothered License 2025 (CBL).  
+See the [LICENSE](https://raw.githubusercontent.com/sasairc2/tracell/refs/heads/main/LICENSE) file for details.
 
 ## Author
 

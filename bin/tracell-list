@@ -6,8 +6,8 @@
 # It logs what gets installed, helps list it, and can clean it up later.
 # Inspired by porg, LFS, and the joy of knowing what your system is doing.
 #
-# License: WTFPL
-# Author: sasairc - 2025
+# License: The Can't Be Bothered License 2025 (CBL)
+# Author:  sasairc - 2025
 
 LOGDIR="${HOME}/local/var/log/tracell-logs"
 
